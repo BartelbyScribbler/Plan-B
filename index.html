@@ -63,6 +63,14 @@
       <section id="view-progress" class="view" aria-labelledby="progress-title">
         <div class="subhead"><div class="eyebrow">BODY RECOMPOSITION</div><h1 id="progress-title">Look for trends.</h1><p>Measurements once a week are plenty. Same time of day, same method. Leave anything you're not tracking blank.</p></div>
         <div class="panel">
+          <div class="panel-head">
+            <div><h2>Strength trend</h2><p>Best repetitions in each completed workout.</p></div>
+            <select id="exercise-select" class="metric" aria-label="Choose exercise for strength trend"></select>
+          </div>
+          <div id="strength-chart" class="chart-container"></div>
+          <p class="tiny" style="margin:5px 0 0">Compare repetitions at the same weight. When the weight increases, repetitions may drop even as strength improves.</p>
+        </div>
+        <div class="panel">
           <h2 style="margin-bottom:15px">Record a check-in</h2>
           <form id="measure-form">
             <div class="form-grid">
