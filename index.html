@@ -7,8 +7,10 @@
   <meta name="description" content="Plan B. A lightweight, private-by-default strength and body recomposition journal.">
   <title>Plan B | Build Your Better</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
   <script src="app.js" defer></script>
+  <script>if("serviceWorker" in navigator && location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));</script>
 </head>
 <body>
   <div class="shell">
