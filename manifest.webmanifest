@@ -1,0 +1,18 @@
+{
+  "name": "Plan B — Fitness Tracker",
+  "short_name": "Plan B",
+  "description": "A private-by-default strength and body recomposition journal",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1016",
+  "theme_color": "#0b1016",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
