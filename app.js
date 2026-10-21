@@ -45,6 +45,7 @@ let state = {
 const loadedDraft = readJSON(DRAFT_KEY, {});
 let draft = {started:loadedDraft.started || new Date().toISOString(),sets:Array.isArray(loadedDraft.sets) ? loadedDraft.sets : [],note:typeof loadedDraft.note === "string" ? loadedDraft.note : ""};
 let activeMetric = "waist";
+let activeExercise = "row";
 let toastTimer;
 const exercises = () => DEFAULT_EXERCISES.concat(state.customExercises.filter(e => e && e.id && e.name));
 const exById = (id) => exercises().find(e => e.id === id);
@@ -148,6 +149,38 @@ function renderWorkout() {
   $("finish-workout").disabled = n===0;
   $("discard-workout").disabled = n===0 && !draft.note;
 }
+function renderStrengthChart() {
+  const select = $("exercise-select");
+  const choices=exercises();
+  if(!choices.some(e=>e.id===activeExercise))activeExercise=choices[0].id;
+  select.innerHTML=choices.map(e=>'<option value="'+escapeHTML(e.id)+'">'+escapeHTML(e.name)+'</option>').join("");
+  select.value=activeExercise;
+  const points=sortedSessions().slice().reverse().map(session=>{
+    const sets=session.sets.filter(set=>set.exerciseId===activeExercise);
+    if(!sets.length)return null;
+    const best=sets.reduce((a,b)=>Number(b.reps)>Number(a.reps)?b:a);
+    return {date:session.date,reps:Number(best.reps)||0,weight:Number(best.weight)||0};
+  }).filter(Boolean).slice(-10);
+  if(!points.length){
+    $("strength-chart").innerHTML='<div class="chart-empty">Log a workout to see the trend for this exercise.</div>';
+    return;
+  }
+  const max=Math.max(15,...points.map(p=>p.reps));
+  const chartBottom=135, chartHeight=100;
+  const grid=[0,5,10,15].filter(n=>n<=max).map(n=>{
+    const y=chartBottom-n/max*chartHeight;
+    return '<line x1="31" x2="635" y1="'+y+'" y2="'+y+'" stroke="#334751"/><text x="25" y="'+(y+4)+'" fill="#a1b3ba" font-size="12" text-anchor="end">'+n+'</text>';
+  }).join("");
+  const gap=580/points.length, width=Math.min(42,gap-8);
+  const bars=points.map((p,i)=>{
+    const x=44+i*gap+(gap-width)/2,ht=p.reps/max*chartHeight,y=chartBottom-ht;
+    return '<rect x="'+x+'" y="'+y+'" width="'+width+'" height="'+ht+'" rx="5" fill="#8bd9db"/>'+
+     '<text x="'+(x+width/2)+'" y="'+Math.max(17,y-7)+'" fill="#edf8f5" font-size="13" font-weight="700" text-anchor="middle">'+p.reps+'</text>'+
+     '<text x="'+(x+width/2)+'" y="159" fill="#a1b3ba" font-size="12" text-anchor="middle">'+escapeHTML(humanDate(p.date))+'</text>'+
+     '<text x="'+(x+width/2)+'" y="180" fill="#b5eb72" font-size="12" text-anchor="middle">'+(p.weight?formatValue(p.weight)+"lb":"BW")+'</text>';
+  }).join("");
+  $("strength-chart").innerHTML='<svg class="chart-svg" viewBox="0 0 640 192" role="img" aria-label="Best set repetitions and loads over time for '+escapeHTML((exById(activeExercise)||{}).name||"selected exercise")+'">'+grid+bars+'</svg>';
+}
 function renderMeasurementChart() {
   const label = {weight:"Weight (lb)",waist:"Waist (in)",chest:"Chest (in)",arm:"Upper arm (in)"}[activeMetric];
   const points = sortedMeasurements().filter(m => typeof m[activeMetric] === "number" && Number.isFinite(m[activeMetric])).slice(-12);
@@ -197,7 +230,7 @@ function renderWorkoutHistory() {
 function renderAll() {
   $("today").textContent=new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
   $("measure-date").value=localDay();
-  renderStats(); renderWeeklyChart(); renderHabits(); renderWorkout(); renderMeasurementChart(); renderMeasurementHistory(); renderWorkoutHistory();
+  renderStats(); renderWeeklyChart(); renderHabits(); renderWorkout(); renderStrengthChart(); renderMeasurementChart(); renderMeasurementHistory(); renderWorkoutHistory();
 }
 function addSet(id) {
   const e=exById(id);
@@ -295,6 +328,7 @@ document.addEventListener("change",e=>{
     saveState();
   }
   if(e.target.id==="metric-select"){activeMetric=e.target.value;renderMeasurementChart();}
+  if(e.target.id==="exercise-select"){activeExercise=e.target.value;renderStrengthChart();}
 });
 $("session-note").addEventListener("input",e=>{draft.note=e.target.value;saveDraft();});
 $("finish-workout").addEventListener("click",saveWorkout);
