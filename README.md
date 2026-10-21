@@ -13,7 +13,7 @@ After enabling GitHub Pages for this repository:
 3. Choose **main** and **/(root)**, then save.
 4. Visit `https://bartelbyscribbler.github.io/Plan-B/`.
 
-Alternatively, open `index.html` locally in a browser. There is no build step and no dependencies.
+There is no build step and no dependencies. **Use the GitHub Pages URL rather than opening the HTML file directly** for reliable browser storage and offline behavior. In Chrome on Android, you can use the browser menu's **Add to Home screen** option. After your first online visit, the app also caches its interface for offline use.
 
 ## Features
 
